@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../core/services/model_service.dart';
 import '../../../core/services/maintenance_service.dart';
 import '../../auth/pages/auth_gate.dart';
@@ -12,11 +11,34 @@ class SplashPage extends StatefulWidget {
   State<SplashPage> createState() => _SplashPageState();
 }
 
-class _SplashPageState extends State<SplashPage> {
+class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _fadeAnimation;
+
   @override
   void initState() {
     super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    );
+    _scaleAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    );
+    _fadeAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    );
+    _controller.forward();
     _initializeApp();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   Future<void> _initializeApp() async {
@@ -73,19 +95,15 @@ class _SplashPageState extends State<SplashPage> {
     return Scaffold(
       backgroundColor: colorScheme.background,
       body: Center(
-        child: RichText(
-          text: TextSpan(
-            children: [
-              TextSpan(
-                text: 'AhamAI',
-                style: GoogleFonts.inter(
-                  fontSize: 48,
-                  fontWeight: FontWeight.w700,
-                  color: colorScheme.primary,
-                  letterSpacing: 1.0,
-                ),
-              ),
-            ],
+        child: FadeTransition(
+          opacity: _fadeAnimation,
+          child: ScaleTransition(
+            scale: _scaleAnimation,
+            child: Icon(
+              Icons.auto_awesome,
+              size: 96,
+              color: colorScheme.primary,
+            ),
           ),
         ),
       ),

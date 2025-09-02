@@ -634,6 +634,12 @@ class _ChatPageState extends State<ChatPage> {
       case RequestType.diagram:
         await _handleDiagramGeneration(content);
         return;
+      case RequestType.flashcards:
+        await _handleFlashcardGeneration(content);
+        return;
+      case RequestType.quiz:
+        await _handleQuizGeneration(content);
+        return;
       case RequestType.text:
         break;
     }
@@ -1415,7 +1421,7 @@ Generate the complete presentation now:''';
     }
   }
 
-  void _handleFlashcardGeneration(String prompt) async {
+  Future<void> _handleFlashcardGeneration(String prompt) async {
     if (!mounted) return;
     
     // Add user message
@@ -1531,7 +1537,7 @@ Generate a comprehensive set of flashcards covering key concepts.
     }
   }
 
-  void _handleQuizGeneration(String prompt) async {
+  Future<void> _handleQuizGeneration(String prompt) async {
     if (!mounted) return;
     
     // Add user message

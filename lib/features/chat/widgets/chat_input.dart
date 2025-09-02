@@ -13,7 +13,16 @@ import '../../../core/services/prompt_enhancer_service.dart';
 import '../../../core/services/ad_service.dart';
 import '../../../core/services/pdf_service.dart';
 import '../../../core/services/api_service.dart';
+import '../../../core/models/request_type.dart';
 import '../../../shared/widgets/prompt_enhancer.dart';
+
+enum _DetectedTool {
+  image,
+  diagram,
+  presentation,
+  flashcards,
+  quiz,
+}
 
 class ChatInput extends StatefulWidget {
   final TextEditingController? controller;
@@ -183,6 +192,46 @@ class _ChatInputState extends State<ChatInput> with TickerProviderStateMixin {
       widget.onGenerateQuiz!(message);
       setState(() => _quizGenerationMode = false);
     } else {
+      final detected = await _detectTool(message);
+      if (detected != null) {
+        switch (detected) {
+          case _DetectedTool.image:
+            if (widget.onGenerateImage != null) {
+              widget.onGenerateImage!(message);
+              HapticFeedback.lightImpact();
+              return;
+            }
+            break;
+          case _DetectedTool.diagram:
+            if (widget.onGenerateDiagram != null) {
+              widget.onGenerateDiagram!(message);
+              HapticFeedback.lightImpact();
+              return;
+            }
+            break;
+          case _DetectedTool.presentation:
+            if (widget.onGeneratePresentation != null) {
+              widget.onGeneratePresentation!(message);
+              HapticFeedback.lightImpact();
+              return;
+            }
+            break;
+          case _DetectedTool.flashcards:
+            if (widget.onGenerateFlashcards != null) {
+              widget.onGenerateFlashcards!(message);
+              HapticFeedback.lightImpact();
+              return;
+            }
+            break;
+          case _DetectedTool.quiz:
+            if (widget.onGenerateQuiz != null) {
+              widget.onGenerateQuiz!(message);
+              HapticFeedback.lightImpact();
+              return;
+            }
+            break;
+        }
+      }
       final originalQuery = message;
       final buffer = StringBuffer();
 
@@ -229,6 +278,28 @@ class _ChatInputState extends State<ChatInput> with TickerProviderStateMixin {
     }
 
     HapticFeedback.lightImpact();
+  }
+
+  Future<_DetectedTool?> _detectTool(String message) async {
+    try {
+      final requestType = await ApiService.classifyRequest(message);
+      switch (requestType) {
+        case RequestType.image:
+          return _DetectedTool.image;
+        case RequestType.diagram:
+          return _DetectedTool.diagram;
+        case RequestType.presentation:
+          return _DetectedTool.presentation;
+        case RequestType.flashcards:
+          return _DetectedTool.flashcards;
+        case RequestType.quiz:
+          return _DetectedTool.quiz;
+        case RequestType.text:
+          return null;
+      }
+    } catch (_) {
+      return null;
+    }
   }
 
   void _handleStop() {
