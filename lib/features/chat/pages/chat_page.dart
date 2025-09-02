@@ -1421,7 +1421,7 @@ Generate the complete presentation now:''';
     }
   }
 
-  void _handleFlashcardGeneration(String prompt) async {
+  Future<void> _handleFlashcardGeneration(String prompt) async {
     if (!mounted) return;
     
     // Add user message
@@ -1537,7 +1537,7 @@ Generate a comprehensive set of flashcards covering key concepts.
     }
   }
 
-  void _handleQuizGeneration(String prompt) async {
+  Future<void> _handleQuizGeneration(String prompt) async {
     if (!mounted) return;
     
     // Add user message
