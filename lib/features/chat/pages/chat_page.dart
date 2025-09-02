@@ -634,6 +634,12 @@ class _ChatPageState extends State<ChatPage> {
       case RequestType.diagram:
         await _handleDiagramGeneration(content);
         return;
+      case RequestType.flashcards:
+        await _handleFlashcardGeneration(content);
+        return;
+      case RequestType.quiz:
+        await _handleQuizGeneration(content);
+        return;
       case RequestType.text:
         break;
     }

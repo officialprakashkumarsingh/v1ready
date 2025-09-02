@@ -13,6 +13,7 @@ import '../../../core/services/prompt_enhancer_service.dart';
 import '../../../core/services/ad_service.dart';
 import '../../../core/services/pdf_service.dart';
 import '../../../core/services/api_service.dart';
+import '../../../core/models/request_type.dart';
 import '../../../shared/widgets/prompt_enhancer.dart';
 
 enum _DetectedTool {
@@ -191,7 +192,7 @@ class _ChatInputState extends State<ChatInput> with TickerProviderStateMixin {
       widget.onGenerateQuiz!(message);
       setState(() => _quizGenerationMode = false);
     } else {
-      final detected = _detectTool(message);
+      final detected = await _detectTool(message);
       if (detected != null) {
         switch (detected) {
           case _DetectedTool.image:
@@ -279,25 +280,26 @@ class _ChatInputState extends State<ChatInput> with TickerProviderStateMixin {
     HapticFeedback.lightImpact();
   }
 
-  _DetectedTool? _detectTool(String message) {
-    final lower = message.toLowerCase();
-    if ((lower.contains('image') || lower.contains('picture') || lower.contains('photo')) &&
-        (lower.contains('generate') || lower.contains('create'))) {
-      return _DetectedTool.image;
+  Future<_DetectedTool?> _detectTool(String message) async {
+    try {
+      final requestType = await ApiService.classifyRequest(message);
+      switch (requestType) {
+        case RequestType.image:
+          return _DetectedTool.image;
+        case RequestType.diagram:
+          return _DetectedTool.diagram;
+        case RequestType.presentation:
+          return _DetectedTool.presentation;
+        case RequestType.flashcards:
+          return _DetectedTool.flashcards;
+        case RequestType.quiz:
+          return _DetectedTool.quiz;
+        case RequestType.text:
+          return null;
+      }
+    } catch (_) {
+      return null;
     }
-    if (lower.contains('diagram') || lower.contains('flowchart') || lower.contains('mind map')) {
-      return _DetectedTool.diagram;
-    }
-    if (lower.contains('presentation') || lower.contains('slides')) {
-      return _DetectedTool.presentation;
-    }
-    if (lower.contains('flashcard')) {
-      return _DetectedTool.flashcards;
-    }
-    if (lower.contains('quiz') || lower.contains('questionnaire')) {
-      return _DetectedTool.quiz;
-    }
-    return null;
   }
 
   void _handleStop() {

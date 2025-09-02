@@ -25,11 +25,11 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
     );
     _scaleAnimation = CurvedAnimation(
       parent: _controller,
-      curve: Curves.easeOutBack,
+      curve: Curves.easeInOut,
     );
     _fadeAnimation = CurvedAnimation(
       parent: _controller,
-      curve: Curves.easeIn,
+      curve: Curves.easeInOut,
     );
     _controller.forward();
     _initializeApp();
@@ -100,7 +100,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
           child: ScaleTransition(
             scale: _scaleAnimation,
             child: Icon(
-              Icons.rocket_launch,
+              Icons.auto_awesome,
               size: 96,
               color: colorScheme.primary,
             ),

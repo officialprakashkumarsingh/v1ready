@@ -205,7 +205,7 @@ class ApiService {
             {
               'role': 'system',
               'content':
-                  'You classify requests for an AI assistant that can generate text, images, presentations and diagrams. Respond with exactly one word: text, image, presentation, or diagram.'
+                  'You classify requests for an AI assistant that can generate text, images, presentations, diagrams, flashcards, and quizzes. Respond with exactly one word: text, image, presentation, diagram, flashcards, or quiz.'
             },
             {
               'role': 'user',
@@ -244,6 +244,8 @@ class ApiService {
             return RequestType.presentation;
           }
           if (firstWord.startsWith('diagram')) return RequestType.diagram;
+          if (firstWord.startsWith('flash')) return RequestType.flashcards;
+          if (firstWord.startsWith('quiz') || firstWord.startsWith('mcq')) return RequestType.quiz;
         }
       }
     } catch (_) {}
