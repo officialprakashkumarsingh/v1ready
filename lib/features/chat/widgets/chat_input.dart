@@ -15,6 +15,14 @@ import '../../../core/services/pdf_service.dart';
 import '../../../core/services/api_service.dart';
 import '../../../shared/widgets/prompt_enhancer.dart';
 
+enum _DetectedTool {
+  image,
+  diagram,
+  presentation,
+  flashcards,
+  quiz,
+}
+
 class ChatInput extends StatefulWidget {
   final TextEditingController? controller;
   final Future<void> Function(String, {String? hiddenContent}) onSendMessage;
@@ -183,6 +191,46 @@ class _ChatInputState extends State<ChatInput> with TickerProviderStateMixin {
       widget.onGenerateQuiz!(message);
       setState(() => _quizGenerationMode = false);
     } else {
+      final detected = _detectTool(message);
+      if (detected != null) {
+        switch (detected) {
+          case _DetectedTool.image:
+            if (widget.onGenerateImage != null) {
+              widget.onGenerateImage!(message);
+              HapticFeedback.lightImpact();
+              return;
+            }
+            break;
+          case _DetectedTool.diagram:
+            if (widget.onGenerateDiagram != null) {
+              widget.onGenerateDiagram!(message);
+              HapticFeedback.lightImpact();
+              return;
+            }
+            break;
+          case _DetectedTool.presentation:
+            if (widget.onGeneratePresentation != null) {
+              widget.onGeneratePresentation!(message);
+              HapticFeedback.lightImpact();
+              return;
+            }
+            break;
+          case _DetectedTool.flashcards:
+            if (widget.onGenerateFlashcards != null) {
+              widget.onGenerateFlashcards!(message);
+              HapticFeedback.lightImpact();
+              return;
+            }
+            break;
+          case _DetectedTool.quiz:
+            if (widget.onGenerateQuiz != null) {
+              widget.onGenerateQuiz!(message);
+              HapticFeedback.lightImpact();
+              return;
+            }
+            break;
+        }
+      }
       final originalQuery = message;
       final buffer = StringBuffer();
 
@@ -229,6 +277,27 @@ class _ChatInputState extends State<ChatInput> with TickerProviderStateMixin {
     }
 
     HapticFeedback.lightImpact();
+  }
+
+  _DetectedTool? _detectTool(String message) {
+    final lower = message.toLowerCase();
+    if ((lower.contains('image') || lower.contains('picture') || lower.contains('photo')) &&
+        (lower.contains('generate') || lower.contains('create'))) {
+      return _DetectedTool.image;
+    }
+    if (lower.contains('diagram') || lower.contains('flowchart') || lower.contains('mind map')) {
+      return _DetectedTool.diagram;
+    }
+    if (lower.contains('presentation') || lower.contains('slides')) {
+      return _DetectedTool.presentation;
+    }
+    if (lower.contains('flashcard')) {
+      return _DetectedTool.flashcards;
+    }
+    if (lower.contains('quiz') || lower.contains('questionnaire')) {
+      return _DetectedTool.quiz;
+    }
+    return null;
   }
 
   void _handleStop() {
